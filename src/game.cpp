@@ -156,9 +156,8 @@ void Game::handleCollision() {
   }
 }
 
-// Atualizada para usar a classe Zombie
+// Atualiza a posição do zumbi
 void Game::updateZombie(int zombieIndex) {
-  Point oldPos;
   Point newPos;
 
   {
@@ -166,22 +165,19 @@ void Game::updateZombie(int zombieIndex) {
     if (!running || zombieIndex >= (int)zombies.size())
       return;
 
-    // Copia estado necessário para calcular sem lock
-    oldPos = zombies[zombieIndex].getZombiePosition();
-
+    // Calcula a próxima posição, mas ainda não move o zumbi
     newPos = zombies[zombieIndex].calculateNextMove(player.pos, grid);
   }
 
   {
+    // Entrando na região crítica
     std::lock_guard<std::mutex> lock(gameMutex);
 
-    // Verificamos se a nova posição é válida
+    // Verifica se a nova posição é válida
     if (isValidMove(newPos)) {
-      // Se válido, apenas verificamos colisão
+      // Se válido, movemos o zumbi explicitamente
+      zombies[zombieIndex].setPosition(newPos);
       handleCollision();
-    } else {
-      // Se inválido (bateu noutro zumbi), revertemos para a posição antiga
-      zombies[zombieIndex].setPosition(oldPos);
     }
   }
 }

@@ -7,8 +7,7 @@ using namespace std;
 // Calcula o próximo movimento do zumbi
 Point Zombie::calculateNextMove(Point target, const vector<string> &grid) {
   Point nextStep = calculateBFS(zCoordinates, target, grid);
-  zCoordinates = nextStep;
-  return zCoordinates;
+  return nextStep;
 }
 
 // Função que calcula o BFS

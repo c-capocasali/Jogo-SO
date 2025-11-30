@@ -5,8 +5,7 @@
 
 // Incializa as variáveis
 ZombieSpawner::ZombieSpawner(const Point *playerPosRef)
-    : items_sem(0), slots_sem(3), playerPos(playerPosRef),
-      activeZombies(1) { // Começamos com apenas 1 zumbi
+    : items_sem(0), slots_sem(3), playerPos(playerPosRef), activeZombies(0) {
   running = false;
 }
 
@@ -30,37 +29,34 @@ void ZombieSpawner::stop() {
 // Spawna o zumbi em uma das bordas.
 // Caso jogador presente em uma das bordas escolhidas, seleciona outra
 Point ZombieSpawner::generateBorderPosition() {
-  // Escolhe uma borda: 0=Top, 1=Bottom, 2=Left, 3=Right
-  int edge = rand() % 4;
-  Point p;
+  std::vector<Point> corners = {
+      {1, 1},                           // Canto Superior Esquerdo
+      {GRID_WIDTH - 2, 1},              // Canto Superior Direito
+      {1, GRID_HEIGHT - 2},             // Canto Inferior Esquerdo
+      {GRID_WIDTH - 2, GRID_HEIGHT - 2} // Canto Inferior Direito
+  };
 
+  Point p;
+  bool valid;
+
+  // Tenta escolher um canto que não seja onde o jogador está
   do {
-    edge = rand() % 4;
-    switch (edge) {
-    case 0: // Top
-      p = {rand() % GRID_WIDTH, 0};
-      break;
-    case 1: // Bottom
-      p = {rand() % GRID_WIDTH, GRID_HEIGHT - 1};
-      break;
-    case 2: // Left
-      p = {0, rand() % GRID_HEIGHT};
-      break;
-    case 3: // Right
-      p = {GRID_WIDTH - 1, rand() % GRID_HEIGHT};
-      break;
-    }
-  } while (p.x == playerPos->x && p.y == playerPos->y);
+    int index = rand() % 4; // Escolhe um dos 4 cantos
+    p = corners[index];
+
+    // Verifica se colide com o jogador
+    valid = !(p.x == playerPos->x && p.y == playerPos->y);
+
+  } while (!valid);
 
   return p;
 }
-
 // Código do produtor usando semáforos
 void ZombieSpawner::producerLoop() {
   // Loop do Produtor
   while (running) {
     // Espera 10 segundos
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(6));
     if (!running)
       break;
 

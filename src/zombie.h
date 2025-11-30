@@ -15,7 +15,7 @@ public:
   Point getZombiePosition();
 
   // Calcula o bfs
-  Point calculateBFS(Point start, Point target);
+  Point calculateBFS(Point start, Point target, vector<string> grid);
 
   // Atualiza a posição do zombi
   Point updateZombiePosition(int zombieIndex);

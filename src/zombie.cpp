@@ -5,7 +5,7 @@ using namespace std;
 
 Point Zombie::getZombiePosition() { return zCoordinates; };
 
-Point calculeteBFS(Point start, Point target) {
+Point Zombie::calculateBFS(Point start, Point target, vector<string> grid) {
   // 4 possible movements
   int dx[] = {0, 0, -1, 1};
   int dy[] = {-1, 1, 0, 0};

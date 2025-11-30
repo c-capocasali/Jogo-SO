@@ -10,7 +10,7 @@ TARGET_NAME = zombie_game
 ifeq ($(OS),Windows_NT)
 	TARGET = $(TARGET_NAME).exe
 	MKDIR_CMD = powershell -Command "New-Item -ItemType Directory -Force $(BUILD_DIR) | Out-Null"
-	CLEAN_CMD = powershell -Command "Remove-Item -Recurse -Force $(BUILD_DIR), $(TARGET) -ErrorAction SilentlyContinue"
+	CLEAN_CMD = powershell -Command "if (Test-Path $(BUILD_DIR)) { Remove-Item -Recurse -Force $(BUILD_DIR) }; if (Test-Path $(TARGET)) { Remove-Item -Force $(TARGET) }"
 else
 	TARGET = $(TARGET_NAME)
 	MKDIR_CMD = mkdir -p $(BUILD_DIR)

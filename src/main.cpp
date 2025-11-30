@@ -90,67 +90,67 @@ void zombieThreadFunc(Game* game, int zombieIndex) {
 }
 
 int main() {
-    enableWindowsANSI();
+    char playAgain;
 
-    Game game;
-    game.init();
+    do {
+        enableWindowsANSI();
 
-    // Limpa a tela antes de começar
-    std::cout << "\033[H\033[2J";
+        Game game;
+        game.init();
 
-    bool exitFlag = false;
+        // Limpa a tela antes de começar
+        std::cout << "\033[H\033[2J";
 
-    // Começa a thread de entradas
-    setNonBlockingInput(true);
-    std::thread inputThread(inputThreadFunc, &game, &exitFlag);
+        bool exitFlag = false;
 
-    // Começa as threads de zumbis
-    std::vector<std::thread> zombieThreads;
-    for (int i = 0; i < ZOMBIE_COUNT; ++i) {
-        zombieThreads.emplace_back(zombieThreadFunc, &game, i);
-    }
+        // Começa a thread de entradas
+        setNonBlockingInput(true);
+        std::thread inputThread(inputThreadFunc, &game, &exitFlag);
 
-    // Loop Principal (Movimento do Player + Render + Timer)
-    auto startTime = std::chrono::steady_clock::now();
-    
-    while (!exitFlag && game.isRunning()) {
-        // Verifica tempo decorrido
-        auto now = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
-        if (elapsed >= GAME_DURATION_SECONDS) break;
+        // Começa as threads de zumbis
+        std::vector<std::thread> zombieThreads;
+        for (int i = 0; i < ZOMBIE_COUNT; ++i) {
+            zombieThreads.emplace_back(zombieThreadFunc, &game, i);
+        }
 
-        // Atualiza player e desenha o jogo
-        game.updatePlayer();
-        game.draw();
+        // Loop Principal (Movimento do Player + Render + Timer)
+        auto startTime = std::chrono::steady_clock::now();
         
-        std::cout << "Time: " << (GAME_DURATION_SECONDS - elapsed) << "s" << std::endl;
+        while (!exitFlag && game.isRunning()) {
+            // Verifica tempo decorrido
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
+            if (elapsed >= GAME_DURATION_SECONDS) break;
 
-        // Tick Sleep
-        std::this_thread::sleep_for(std::chrono::milliseconds(TICK_RATE_MS));
-    }
+            // Atualiza player e desenha o jogo
+            game.updatePlayer();
+            game.draw();
+            
+            std::cout << "Time: " << (GAME_DURATION_SECONDS - elapsed) << "s" << std::endl;
 
-    // Limpeza ao sair
-    setNonBlockingInput(false); // Devolve o terminal ao estado normal
-    exitFlag = true; // Sinaliza threads para sair
+            // Tick Sleep
+            std::this_thread::sleep_for(std::chrono::milliseconds(TICK_RATE_MS));
+        }
 
-    inputThread.detach();
-    for (auto& t : zombieThreads) t.detach();
+        // Limpeza ao sair
+        setNonBlockingInput(false); // Devolve o terminal ao estado normal
+        exitFlag = true; // Sinaliza threads para sair
 
-    std::cout << "\033[H\033[2J";
+        inputThread.detach();
+        for (auto& t : zombieThreads) t.detach();
 
-    std::cout << "GAME OVER!\n";
-    std::cout << "Final Score: " << game.getScore() << "\n";
-    
-    if (game.getLives() <= 0) std::cout << "Cause: You were eaten.\n";
-    else std::cout << "Cause: Time limit reached.\n";
+        std::cout << "\033[H\033[2J";
 
-    // Pergunta se quer jogar de novo ou sair
-    std::cout << "Play again? (y/n): ";
-    char choice;
-    std::cin >> choice;
-    if (choice == 'y' || choice == 'Y') {
-        main(); // Reinicia o jogo
-    }
+        std::cout << "GAME OVER!\n";
+        std::cout << "Final Score: " << game.getScore() << "\n";
+        
+        if (game.getLives() <= 0) std::cout << "Cause: You were eaten.\n";
+        else std::cout << "Cause: Time limit reached.\n";
+
+        // Pergunta se quer jogar de novo ou sair
+        std::cout << "Play again? (y/n): ";
+        std::cin >> playAgain;
+    } while (playAgain == 'y' || playAgain == 'Y');
 
     return 0;
 }

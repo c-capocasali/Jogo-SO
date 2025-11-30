@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class Zombie {
 private:
   Point zCoordinates;
@@ -22,11 +20,11 @@ public:
   void setPosition(Point p) { zCoordinates = p; }
 
   // Retorna a próxima posição
-  Point calculateNextMove(Point target, const vector<string> &grid);
+  Point calculateNextMove(Point target, const std::vector<std::string> &grid);
 
 private:
   // Usa BFS para calcular a posição do jogador
-  Point calculateBFS(Point start, Point target, const vector<string> &grid);
+  Point calculateBFS(Point start, Point target, const std::vector<std::string> &grid);
 };
 
 #endif

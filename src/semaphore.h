@@ -4,19 +4,18 @@
 #include <condition_variable>
 #include <mutex>
 
-using namespace std;
 class Semaphore {
 private:
   // Atributos
-  mutex mtx;
-  condition_variable cv;
+  std::mutex mtx;
+  std::condition_variable cv;
   int count;
 
 public:
   // Construtor
   Semaphore(int init_count = 0) { count = init_count; }
 
-  // Opração down
+  // Operação down
   void wait() {
     std::unique_lock<std::mutex> lock(mtx);
 
@@ -31,7 +30,7 @@ public:
 
   // Tenta esperar sem bloquear
   bool try_wait() {
-    unique_lock<mutex> lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     if (count > 0) {
       count--;
       return true;
@@ -41,7 +40,7 @@ public:
 
   // Operação UP
   void signal() {
-    unique_lock<mutex> lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     count++;
     // acorda thread para no wait();
     cv.notify_one();

@@ -8,8 +8,6 @@
 #include <queue>
 #include <thread>
 
-using namespace std;
-
 class ZombieSpawner {
 public:
   // Recebe referência do playerPosition para calcular spawn longe dele
@@ -32,20 +30,20 @@ private:
   void producerLoop();
   Point generateBorderPosition();
 
-  queue<Point> spawnQueue; // Buffer compartilhado
+  std::queue<Point> spawnQueue; // Buffer compartilhado
 
   // Sincronização
   Semaphore items_sem; // Conta itens na fila (Full)
   Semaphore slots_sem; // Conta espaços vazios (Empty)
-  mutex queueMutex;
+  std::mutex queueMutex;
 
   // Controle da Thread
-  thread spawnerThread;
-  atomic<bool> running;
+  std::thread spawnerThread;
+  std::atomic<bool> running;
 
   // Estado do Jogo
   const Point *playerPos;    // Ponteiro de leitura para posição do player
-  atomic<int> activeZombies; // Controla limite de 3
+  std::atomic<int> activeZombies; // Controla limite de 3
 };
 
 #endif

@@ -51,7 +51,7 @@ private:
   Point getNextPosition(Point current, Direction dir);
 
   bool isValidMove(Point p);
-  void handleCollision();
+  void handleDamaging();
   void checkItemCollection(Point p);
 };
 

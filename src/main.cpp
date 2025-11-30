@@ -84,7 +84,7 @@ void inputThreadFunc(Game* game, bool* exitFlag) {
 // 2. Thread de Zumbi: Atualiza movimento do zumbi
 void zombieThreadFunc(Game* game, int zombieIndex) {
     while (game->isRunning()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(int(TICK_RATE_MS / ZOMBIE_MOVE_MODIFIER)));
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(TICK_RATE_MS / ZOMBIE_SPEED_MODIFIER)));
         game->updateZombie(zombieIndex);
     }
 }

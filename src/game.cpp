@@ -72,7 +72,6 @@ void Game::updatePlayer() {
   if (isValidMove(next)) {
     player.pos = next;
     checkItemCollection(next);
-    handleCollision();
   }
 }
 
@@ -126,17 +125,12 @@ void Game::checkItemCollection(Point p) {
   }
 }
 
-void Game::handleCollision() {
-
-  for (auto &z : zombies) {
-    if (player.pos == z.getZombiePosition()) {
-      std::lock_guard<std::mutex> lifeLock(livesMutex);
-      lives--;
-      if (lives <= 0)
-        running = false;
-      return;
-    }
-  }
+void Game::handleDamaging() {
+  std::lock_guard<std::mutex> lifeLock(livesMutex);
+  lives--;
+  if (lives <= 0)
+    running = false;
+  return;
 }
 
 // Atualiza a posição do zumbi
@@ -159,8 +153,11 @@ void Game::updateZombie(int zombieIndex) {
     // Verifica se a nova posição é válida
     if (isValidMove(newPos)) {
       // Se válido, movemos o zumbi explicitamente
+      if (newPos.x == player.pos.x && newPos.y == player.pos.y) {
+        handleDamaging();
+        return;
+      }
       zombies[zombieIndex].setPosition(newPos);
-      handleCollision();
     }
   }
 }

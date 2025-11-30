@@ -6,11 +6,11 @@
 // --- Configurações do Jogo ---
 const int GRID_WIDTH = 20;
 const int GRID_HEIGHT = 20;
-const int GAME_DURATION_SECONDS = 60; // Tempo total do jogo
-const int TICK_RATE_MS = 500;         // Velocidade de movimento do player
+const int GAME_DURATION_SECONDS = 60;     // Tempo total do jogo
+const int TICK_RATE_MS = 500;             // Velocidade de movimento do player
 const int ZOMBIE_COUNT = 3;
 const int ITEMS_BATCH_SIZE = 5;
-const float ZOMBIE_MOVE_MODIFIER = 0.8f; // Zumbis se movem a 80% da velocidade do player
+const float ZOMBIE_SPEED_MODIFIER = 0.9f; // Zumbis se movem a 90% da velocidade do player
 
 // --- Símbolos ---
 const char SYMBOL_PLAYER = 'P';

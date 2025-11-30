@@ -37,6 +37,7 @@ private:
   std::vector<std::string> grid;
   Entity player;
   std::vector<Zombie> zombies;
+  ZombieSpawner *spawner;
   int score;
   int lives;
   int itemsRemaining;
@@ -48,7 +49,7 @@ private:
 
   // Internal Helpers
   Point getNextPosition(Point current, Direction dir);
-  Point calculateBFS(Point start, Point target);
+
   bool isValidMove(Point p);
   void handleCollision();
   void checkItemCollection(Point p);

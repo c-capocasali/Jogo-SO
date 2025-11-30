@@ -162,5 +162,13 @@ int main() {
     if (game.getLives() <= 0) std::cout << "Cause: You were eaten.\n";
     else std::cout << "Cause: Time limit reached.\n";
 
+    // Pergunta se quer jogar de novo ou sair
+    std::cout << "Play again? (y/n): ";
+    char choice;
+    std::cin >> choice;
+    if (choice == 'y' || choice == 'Y') {
+        main(); // Reinicia o jogo
+    }
+
     return 0;
 }

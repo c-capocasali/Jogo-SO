@@ -14,26 +14,26 @@ public:
   Game();
   ~Game();
 
-  // Core setup
+  // Setup principal
   void init();
   void spawnItems();
 
-  // Actions (Thread Safe)
+  // Ações
   void updatePlayer();
   void updateZombie(int zombieIndex);
   void checkNewZombies();
   void setPlayerDirection(Direction d);
 
-  // Rendering
+  // Renderização
   void draw();
 
-  // State Checkers
+  // Checagens de Estado
   bool isRunning() const;
   int getScore() const;
   int getLives() const;
 
 private:
-  // Game State
+  // Estado de jogo
   std::vector<std::string> grid;
   Entity player;
   std::vector<Zombie> zombies;
@@ -43,11 +43,11 @@ private:
   int itemsRemaining;
   std::atomic<bool> running;
 
-  // Synchronization
-  std::mutex gameMutex;  // Protects grid, lives, and positions
-  std::mutex livesMutex; // Specific requirement from prompt
+  // Sincronização
+  std::mutex gameMutex;  // Protege grid, vidas, e posições
+  std::mutex livesMutex;
 
-  // Internal Helpers
+  // Helpers
   Point getNextPosition(Point current, Direction dir);
 
   bool isValidMove(Point p);

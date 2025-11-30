@@ -1,16 +1,10 @@
 #include "game.h"
 #include "zombie_spawner.h"
+#include "map.h"
+#include "utils.h"
 #include <iostream>
 #include <random>
 #include <vector>
-
-// Helper for random numbers
-int getRandom(int min, int max) {
-  static std::random_device rd;
-  static std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dis(min, max);
-  return dis(gen);
-}
 
 Game::~Game() {
   if (spawner) {
@@ -20,38 +14,27 @@ Game::~Game() {
 }
 
 Game::Game() : score(0), lives(3), itemsRemaining(0), running(true) {
-  player.facing = RIGHT; // Default direction
+  player.facing = RIGHT; // Direção inicial
   spawner = new ZombieSpawner(&player.pos);
 }
 
 void Game::init() {
   std::lock_guard<std::mutex> lock(gameMutex);
 
-  // 1. Create Grid
-  grid.resize(GRID_HEIGHT);
-  for (int y = 0; y < GRID_HEIGHT; ++y) {
-    grid[y] = std::string(GRID_WIDTH, SYMBOL_EMPTY);
+  // 1. Criar um grid aleatório
+  grid = generateRandomMap();
 
-    // Add borders
-    for (int x = 0; x < GRID_WIDTH; ++x) {
-      if (y == 0 || y == GRID_HEIGHT - 1 || x == 0 || x == GRID_WIDTH - 1) {
-        grid[y][x] = SYMBOL_WALL;
-      }
-    }
-  }
-
-  // 2. Place Player (Center)
+  // 2. Colocar o player no centro
   player.pos = {GRID_WIDTH / 2, GRID_HEIGHT / 2};
 
-  // 3. Start Spawner
+  // 3. Iniciar o spawner de zumbis
   spawner->start();
 
-  // 4. Initial Items
+  // 4. Colocar os itens iniciais
   spawnItems();
 }
 
 void Game::spawnItems() {
-  // Note: Mutex should be locked by caller if calling from update
   for (int i = 0; i < ITEMS_BATCH_SIZE; ++i) {
     int x, y;
     do {
@@ -185,26 +168,25 @@ void Game::updateZombie(int zombieIndex) {
 void Game::draw() {
   std::lock_guard<std::mutex> lock(gameMutex);
 
-  // Move cursor to top-left
+  // Move o cursor para o topo esquerdo
   std::cout << "\033[H";
 
-  // Header
+  // Imprime o header
   std::cout << "SCORE: " << score << " | LIVES: " << lives
             << " | ZOMBIES: " << zombies.size() << "\n";
 
-  // Draw Grid
+  // Desenha o grid
   for (int y = 0; y < GRID_HEIGHT; ++y) {
     for (int x = 0; x < GRID_WIDTH; ++x) {
       bool dynamicDrawn = false;
 
-      // Draw Player
+      // Desenha o Player
       if (player.pos.x == x && player.pos.y == y) {
         std::cout << COLOR_PLAYER << SYMBOL_PLAYER << COLOR_RESET;
         dynamicDrawn = true;
       }
-      // Draw Zombies
+      // Desenha os Zumbis
       else {
-        // CORREÇÃO: Usar getZombiePosition()
         for (auto &z : zombies) {
           Point zp = z.getZombiePosition();
           if (zp.x == x && zp.y == y) {
@@ -221,7 +203,7 @@ void Game::draw() {
         else
           std::cout << grid[y][x];
       }
-      std::cout << " "; // spacing for aspect ratio
+      std::cout << " ";
     }
     std::cout << "\n";
   }

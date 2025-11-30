@@ -4,19 +4,17 @@
 #include <vector>
 #include "game.h"
 
-// --- Platform Specific Includes ---
+// --- Includes específicos de SO ---
 #ifdef _WIN32
     #include <windows.h>
-    #include <conio.h> // For _kbhit() and _getch()
+    #include <conio.h>
 #else
     #include <termios.h>
     #include <unistd.h>
     #include <fcntl.h>
 #endif
 
-// --- Cross-Platform Console Setup ---
-
-// Enable ANSI colors for Windows 10+
+// Permite uso de cores ANSI no Windows
 void enableWindowsANSI() {
 #ifdef _WIN32
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -27,22 +25,20 @@ void enableWindowsANSI() {
 #endif
 }
 
-// Configures terminal for non-blocking raw input
+// Configura o terminal para input não bloqueante
 void setNonBlockingInput(bool enable) {
 #ifdef _WIN32
-    // Windows doesn't need specific blocking configuration for _kbhit/_getch
-    // But we might want to hide the cursor
     HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO info;
     info.dwSize = 100;
-    info.bVisible = !enable; // Hide cursor when game runs
+    info.bVisible = !enable; // Esconde o cursor durante o jogo
     SetConsoleCursorInfo(consoleHandle, &info);
 #else
     static struct termios oldt, newt;
     if (enable) {
         tcgetattr(STDIN_FILENO, &oldt);
         newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO); // Disable buffer and echo
+        newt.c_lflag &= ~(ICANON | ECHO); // Desabilita buffer e echo
         tcsetattr(STDIN_FILENO, TCSANOW, &newt);
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
@@ -54,13 +50,10 @@ void setNonBlockingInput(bool enable) {
 #endif
 }
 
-// --- Thread Functions ---
-
-// 1. Input Thread: Reads keys instantly
+// 1. Thread de Input: Captura entrada do usuário
 void inputThreadFunc(Game* game, bool* exitFlag) {
     while (!(*exitFlag) && game->isRunning()) {
 #ifdef _WIN32
-        // Windows Logic
         if (_kbhit()) {
             char ch = _getch();
             switch(ch) {
@@ -73,7 +66,6 @@ void inputThreadFunc(Game* game, bool* exitFlag) {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 #else
-        // Linux/Mac Logic
         char ch = getchar();
         if (ch != EOF) {
             switch(ch) {
@@ -89,23 +81,21 @@ void inputThreadFunc(Game* game, bool* exitFlag) {
     }
 }
 
-// 2. Zombie Thread: Calculates path and moves
+// 2. Thread de Zumbi: Atualiza movimento do zumbi
 void zombieThreadFunc(Game* game, int zombieIndex) {
     while (game->isRunning()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(TICK_RATE_MS));
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(TICK_RATE_MS / ZOMBIE_MOVE_MODIFIER)));
         game->updateZombie(zombieIndex);
     }
 }
 
-// --- Main ---
-
 int main() {
-    enableWindowsANSI(); // Ensure colors work on Windows
+    enableWindowsANSI();
 
     Game game;
     game.init();
 
-    // Clear screen once at start
+    // Limpa a tela antes de começar
 #ifdef _WIN32
     system("cls");
 #else
@@ -114,26 +104,26 @@ int main() {
 
     bool exitFlag = false;
 
-    // Start Input Thread
+    // Começa a thread de entradas
     setNonBlockingInput(true);
     std::thread inputThread(inputThreadFunc, &game, &exitFlag);
 
-    // Start Zombie Threads
+    // Começa as threads de zumbis
     std::vector<std::thread> zombieThreads;
     for (int i = 0; i < ZOMBIE_COUNT; ++i) {
         zombieThreads.emplace_back(zombieThreadFunc, &game, i);
     }
 
-    // Main Game Loop (Player Move + Render + Timer)
+    // Loop Principal (Movimento do Player + Render + Timer)
     auto startTime = std::chrono::steady_clock::now();
     
     while (!exitFlag && game.isRunning()) {
-        // Check Time Limit
+        // Verifica tempo decorrido
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - startTime).count();
         if (elapsed >= GAME_DURATION_SECONDS) break;
 
-        // Update Player and Draw
+        // Atualiza player e desenha o jogo
         game.updatePlayer();
         game.draw();
         
@@ -143,9 +133,9 @@ int main() {
         std::this_thread::sleep_for(std::chrono::milliseconds(TICK_RATE_MS));
     }
 
-    // Cleanup
-    setNonBlockingInput(false); // Restore terminal
-    exitFlag = true; // Signal threads to stop
+    // Limpeza ao sair
+    setNonBlockingInput(false); // Devolve o terminal ao estado normal
+    exitFlag = true; // Sinaliza threads para sair
 
     inputThread.detach();
     for (auto& t : zombieThreads) t.detach();

@@ -1,5 +1,6 @@
 #include "zombie_spawner.h"
 #include "config.h"
+#include "utils.h"
 #include <chrono>
 #include <cstdlib>
 
@@ -41,7 +42,7 @@ Point ZombieSpawner::generateBorderPosition() {
 
   // Tenta escolher um canto que não seja onde o jogador está
   do {
-    int index = rand() % 4; // Escolhe um dos 4 cantos
+    int index = getRandom(0, 3); // Escolhe um dos 4 cantos
     p = corners[index];
 
     // Verifica se colide com o jogador

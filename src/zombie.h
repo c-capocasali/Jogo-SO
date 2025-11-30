@@ -1,5 +1,9 @@
+#ifndef ZOMBIE_H
+#define ZOMBIE_H
+
 #include "config.h"
-#include "game.h"
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -8,15 +12,21 @@ private:
   Point zCoordinates;
 
 public:
-  // Construtor da classe
+  // Construtor
   Zombie(Point position) { zCoordinates = position; }
 
-  // Obtem a posição atual do zumbi
-  Point getZombiePosition();
+  // Retorna a posição atual
+  Point getZombiePosition() { return zCoordinates; }
 
-  // Calcula o bfs
-  Point calculateBFS(Point start, Point target, vector<string> grid);
+  // Define uma nova posição
+  void setPosition(Point p) { zCoordinates = p; }
 
-  // Atualiza a posição do zombi
-  Point updateZombiePosition(int zombieIndex);
+  // Retorna a próxima posição
+  Point calculateNextMove(Point target, const vector<string> &grid);
+
+private:
+  // Usa BFS para calcular a posição do jogador
+  Point calculateBFS(Point start, Point target, const vector<string> &grid);
 };
+
+#endif

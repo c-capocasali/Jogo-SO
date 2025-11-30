@@ -1,7 +1,7 @@
 #ifndef ZOMBIE_SPAWNER_H
 #define ZOMBIE_SPAWNER_H
 
-#include "game.h"
+#include "config.h"
 #include "semaphore.h"
 #include <atomic>
 #include <mutex>

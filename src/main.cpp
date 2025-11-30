@@ -96,11 +96,7 @@ int main() {
     game.init();
 
     // Limpa a tela antes de começar
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+    std::cout << "\033[H\033[2J";
 
     bool exitFlag = false;
 
@@ -140,11 +136,7 @@ int main() {
     inputThread.detach();
     for (auto& t : zombieThreads) t.detach();
 
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+    std::cout << "\033[H\033[2J";
 
     std::cout << "GAME OVER!\n";
     std::cout << "Final Score: " << game.getScore() << "\n";

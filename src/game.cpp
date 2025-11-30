@@ -115,6 +115,7 @@ bool Game::isValidMove(Point p) {
 
 void Game::checkItemCollection(Point p) {
   if (grid[p.y][p.x] == SYMBOL_ITEM) {
+    playSoundEffect(0); // Som de coleta
     score += 10;
     grid[p.y][p.x] = SYMBOL_EMPTY;
     itemsRemaining--;
@@ -126,6 +127,7 @@ void Game::checkItemCollection(Point p) {
 
 void Game::handleDamaging() {
   std::lock_guard<std::mutex> lifeLock(livesMutex);
+  playSoundEffect(1); // Som de dano
   lives--;
   if (lives <= 0)
     running = false;

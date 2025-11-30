@@ -1,25 +1,40 @@
-CXX = g++
-CXXFLAGS = -std=c++17 -pthread -Wall
+# Compilador e flags
+CC = g++
+FLAGS = -std=c++17 -pthread -Wall -Wextra
 
-# Defines path to source files
+# Diretórios e nomes de arquivos
 SRC_DIR = src
+BUILD_DIR = build
+TARGET_NAME = zombie_game
 
-# Targets
-TARGET = zombie_game
-SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/game.cpp
-OBJS = $(SRCS:.cpp=.o)
-HDRS = $(SRC_DIR)/game.h $(SRC_DIR)/config.h
+ifeq ($(OS),Windows_NT)
+	TARGET = $(TARGET_NAME).exe
+	MKDIR_CMD = powershell -Command "New-Item -ItemType Directory -Force $(BUILD_DIR) | Out-Null"
+	CLEAN_CMD = powershell -Command "Remove-Item -Recurse -Force $(BUILD_DIR), $(TARGET) -ErrorAction SilentlyContinue"
+else
+	TARGET = $(TARGET_NAME)
+	MKDIR_CMD = mkdir -p $(BUILD_DIR)
+	CLEAN_CMD = rm -rf $(BUILD_DIR) $(TARGET)
+endif
 
-all: $(TARGET)
+# Arquivos
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
+HDRS = $(wildcard $(SRC_DIR)/*.h)
+
+# Regra principal
+all: setup_build $(TARGET)
+
+setup_build:
+	$(MKDIR_CMD)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(FLAGS) -o $(TARGET) $(OBJS)
 
-# Rule to compile .cpp files in src/ to .o files in src/
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS)
+	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJS)
+	$(CLEAN_CMD)
 
 rebuild: clean all

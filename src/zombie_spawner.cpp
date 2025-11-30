@@ -31,26 +31,21 @@ void ZombieSpawner::stop() {
 // Caso jogador presente em uma das bordas escolhidas, seleciona outra
 Point ZombieSpawner::generateBorderPosition() {
   std::vector<Point> corners = {
-      {1, 1},                           // Canto Superior Esquerdo
-      {GRID_WIDTH - 2, 1},              // Canto Superior Direito
-      {1, GRID_HEIGHT - 2},             // Canto Inferior Esquerdo
-      {GRID_WIDTH - 2, GRID_HEIGHT - 2} // Canto Inferior Direito
+    {1, 1},                           // Canto Superior Esquerdo
+    {GRID_WIDTH - 2, 1},              // Canto Superior Direito
+    {1, GRID_HEIGHT - 2},             // Canto Inferior Esquerdo
+    {GRID_WIDTH - 2, GRID_HEIGHT - 2} // Canto Inferior Direito
   };
+  std::vector<Point> validCorners;
 
-  Point p;
-  bool valid;
+  // Filtra apenas os cantos onde o player NÃO está
+  for(auto p : corners) {
+    if(!(p.x == playerPos->x && p.y == playerPos->y)) 
+      validCorners.push_back(p);
+  }
 
-  // Tenta escolher um canto que não seja onde o jogador está
-  do {
-    int index = getRandom(0, 3); // Escolhe um dos 4 cantos
-    p = corners[index];
-
-    // Verifica se colide com o jogador
-    valid = !(p.x == playerPos->x && p.y == playerPos->y);
-
-  } while (!valid);
-
-  return p;
+  // Escolhe um aleatório da lista filtrada
+  return validCorners[getRandom(0, validCorners.size() - 1)];
 }
 // Código do produtor usando semáforos
 void ZombieSpawner::producerLoop() {

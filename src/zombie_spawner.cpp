@@ -51,10 +51,11 @@ Point ZombieSpawner::generateBorderPosition() {
 void ZombieSpawner::producerLoop() {
   // Loop do Produtor
   while (running) {
-    // Espera 10 segundos
-    std::this_thread::sleep_for(std::chrono::seconds(6));
-    if (!running)
-      break;
+    // Espera 6 segundos entre spawns
+    for (int i = 0; i < 60; ++i) { // 60 * 100ms = 6 segundos
+      if (!running) return;        // Saia se o jogo acabou (evita espera desnecessária)
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 
     // Verifica limite de zumbis
     if (activeZombies >= ZOMBIE_COUNT) {

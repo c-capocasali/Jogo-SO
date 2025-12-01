@@ -19,7 +19,6 @@ void ZombieSpawner::start() {
 }
 
 // Função para matar a thread
-// TODO: Verificar essa função
 void ZombieSpawner::stop() {
   running = false;
   if (spawnerThread.joinable()) {
@@ -59,7 +58,7 @@ void ZombieSpawner::producerLoop() {
 
     // Verifica limite de zumbis
     if (activeZombies >= ZOMBIE_COUNT) {
-      continue;
+      break;
     }
 
     // Posição de spawn do zumbi
